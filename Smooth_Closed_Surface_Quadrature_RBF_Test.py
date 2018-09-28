@@ -1,5 +1,5 @@
 import sys
-sys.path.append('../RigidMultiblobsWall/')
+sys.path.append('../fiber/utils/')
 from utils import timer
 
 def Smooth_Closed_Surface_Quadrature_RBF_Test():
@@ -43,15 +43,15 @@ def Smooth_Closed_Surface_Quadrature_RBF_Test():
     Number_of_Quadrature_Nodes=800;
     
     # Generate the quadrature nodes
-    phi=(1+np.sqrt(5))/2;
+    phi=(1+np.sqrt(5)) / 2;
     
     Quadrature_Nodes=np.zeros((Number_of_Quadrature_Nodes,3));
     
-    N=Number_of_Quadrature_Nodes/2;
+    N=Number_of_Quadrature_Nodes // 2;
     
     Sphere_Radius=1;
     
-    timer('create_nodes')
+    timer.timer('create_nodes')
     for Index in range(-N,N):
         lat=np.arcsin((2.*Index)/(2.*N+1))
         lon=(Index % phi)*2*np.pi/phi;
@@ -60,13 +60,13 @@ def Smooth_Closed_Surface_Quadrature_RBF_Test():
         if lon>np.pi:
             lon=lon-2*np.pi;
         Quadrature_Nodes[Index+N,:]=[np.cos(lon)*np.cos(lat),np.sin(lon)*np.cos(lat),np.sin(lat)];
-    timer('create_nodes')
+    timer.timer('create_nodes')
 
     # Generate a triangulation of the surface
-    timer('create_triangulation')
+    timer.timer('create_triangulation')
     hull=ConvexHull(Quadrature_Nodes); 
     Triangles=hull.simplices; 
-    timer('create_triangulation')
+    timer.timer('create_triangulation')
     #==========================================================================
 
     #==========================================================================
@@ -99,14 +99,14 @@ def Smooth_Closed_Surface_Quadrature_RBF_Test():
     #
     #==========================================================================
     # Use the exact surface normal
-    timer('weights_exact')
+    timer.timer('weights_exact')
     Quadrature_Weights_Exact_Normal=Smooth_Closed_Surface_Quadrature_RBF(Quadrature_Nodes,Triangles,h,gradh);
-    timer('weights_exact')
+    timer.timer('weights_exact')
     
     # Use the approximate surface normal
-    timer('weights_approx')
+    timer.timer('weights_approx')
     Quadrature_Weights_Approx_Normal=Smooth_Closed_Surface_Quadrature_RBF(Quadrature_Nodes,Triangles);
-    timer('weights_approx')
+    timer.timer('weights_approx')
     #==========================================================================
     
     #==========================================================================
@@ -127,13 +127,13 @@ def Smooth_Closed_Surface_Quadrature_RBF_Test():
     # generated above.
     #
     #==========================================================================
-    timer('eval_function')
+    timer.timer('eval_function')
     F1=f1(Quadrature_Nodes);
     F2=f2(Quadrature_Nodes);
     F3=f3(Quadrature_Nodes);
     F4=f4(Quadrature_Nodes);
     F5=f5(Quadrature_Nodes);
-    timer('eval_function')
+    timer.timer('eval_function')
     #==========================================================================
 
     #==========================================================================
@@ -155,20 +155,20 @@ def Smooth_Closed_Surface_Quadrature_RBF_Test():
     # integrands using the quadrature weights generated above for comparison.
     #
     #==========================================================================
-    timer('quadrature_exact')
+    timer.timer('quadrature_exact')
     Approximate_Surface_Integral_f1_Exact_Normal=np.dot(F1,Quadrature_Weights_Exact_Normal);
     Approximate_Surface_Integral_f2_Exact_Normal=np.dot(F2,Quadrature_Weights_Exact_Normal);
     Approximate_Surface_Integral_f3_Exact_Normal=np.dot(F3,Quadrature_Weights_Exact_Normal);
     Approximate_Surface_Integral_f4_Exact_Normal=np.dot(F4,Quadrature_Weights_Exact_Normal);
     Approximate_Surface_Integral_f5_Exact_Normal=np.dot(F5,Quadrature_Weights_Exact_Normal);
-    timer('quadrature_exact')
-    timer('quadrature_approx')
+    timer.timer('quadrature_exact')
+    timer.timer('quadrature_approx')
     Approximate_Surface_Integral_f1_Approx_Normal=np.dot(F1,Quadrature_Weights_Approx_Normal);
     Approximate_Surface_Integral_f2_Approx_Normal=np.dot(F2,Quadrature_Weights_Approx_Normal);
     Approximate_Surface_Integral_f3_Approx_Normal=np.dot(F3,Quadrature_Weights_Approx_Normal);
     Approximate_Surface_Integral_f4_Approx_Normal=np.dot(F4,Quadrature_Weights_Approx_Normal);
     Approximate_Surface_Integral_f5_Approx_Normal=np.dot(F5,Quadrature_Weights_Approx_Normal);
-    timer('quadrature_approx')
+    timer.timer('quadrature_approx')
     #==========================================================================
 
     #==========================================================================
@@ -177,7 +177,7 @@ def Smooth_Closed_Surface_Quadrature_RBF_Test():
     # test integrands.
     #
     #==========================================================================
-    timer('errors')
+    timer.timer('errors')
     Error_in_the_Approximate_Surface_Integral_f1_Exact_Normal=np.abs(Exact_Surface_Integral_f1-
         Approximate_Surface_Integral_f1_Exact_Normal)/np.abs(Approximate_Surface_Integral_f1_Exact_Normal);
     Error_in_the_Approximate_Surface_Integral_f2_Exact_Normal=np.abs(Exact_Surface_Integral_f2-
@@ -199,7 +199,7 @@ def Smooth_Closed_Surface_Quadrature_RBF_Test():
         Approximate_Surface_Integral_f4_Approx_Normal)/np.abs(Approximate_Surface_Integral_f4_Approx_Normal);
     Error_in_the_Approximate_Surface_Integral_f5_Approx_Normal=np.abs(Exact_Surface_Integral_f5-
         Approximate_Surface_Integral_f5_Approx_Normal)/np.abs(Approximate_Surface_Integral_f5_Approx_Normal);
-    timer('errors')
+    timer.timer('errors')
     #==========================================================================
     
     
@@ -208,65 +208,65 @@ def Smooth_Closed_Surface_Quadrature_RBF_Test():
     # Print some stuff
     #
     #==========================================================================    
-    print '====================================================================' 
-    print 'The relative error in the approximation of the surface integral of' 
-    print 'f1(x,y,z)= '
-    print '         4    2  2  2    2          5    2'
-    print '        x  + x  y  z  + x  y + x + y  + y  + 1'
-    print 'over the sphere surface (radius 1) with exact and approx normal is'
-    print Error_in_the_Approximate_Surface_Integral_f1_Exact_Normal[0]
-    print Error_in_the_Approximate_Surface_Integral_f1_Approx_Normal[0]
+    print('====================================================================')
+    print('The relative error in the approximation of the surface integral of')
+    print('f1(x,y,z)= ')
+    print('         4    2  2  2    2          5    2')
+    print('        x  + x  y  z  + x  y + x + y  + y  + 1')
+    print('over the sphere surface (radius 1) with exact and approx normal is')
+    print(Error_in_the_Approximate_Surface_Integral_f1_Exact_Normal[0])
+    print(Error_in_the_Approximate_Surface_Integral_f1_Approx_Normal[0])
     
-    print '====================================================================' 
-    print 'The relative error in the approximation of the surface integral of' 
-    print 'f2(x,y,z)=                                                        '
-    print '          /                        2     \ '
-    print '     3    |   9 y   9 z   (9 x + 1)    1 |'
-    print '     - exp| - --- - --- - ---------- - - |'
-    print '     4    \    10    10       49       5 /'
-    print ''
-    print '     1               2            2            2'
-    print '   - - exp(- (9 x - 4)  - (9 y - 7)  - (9 z - 5) )'
-    print '     5 '
-    print ''
-    print '          /            2            2            2 \ '
-    print '     3    |   (9 x - 2)    (9 y - 2)    (9 z - 2)  |'
-    print '   + - exp| - ---------- - ---------- - ---------- |'
-    print '     4    \        4            4            4     /'
-    print ''
-    print '           /            2            2            2 \ '
-    print '     1     |   (9 x - 7)    (9 y - 3)    (9 z - 5)  |'
-    print '   + -  exp| - ---------- - ---------- - ---------- |'
-    print '     2     \        4            4            4     /'
-    print 'over the sphere surface (radius 1) with exact and approx normal is'
-    print Error_in_the_Approximate_Surface_Integral_f2_Exact_Normal[0]
-    print Error_in_the_Approximate_Surface_Integral_f2_Approx_Normal[0]
+    print('====================================================================')
+    print('The relative error in the approximation of the surface integral of')
+    print('f2(x,y,z)=                                                        ')
+    print('          /                        2     \ ')
+    print('     3    |   9 y   9 z   (9 x + 1)    1 |')
+    print('     - exp| - --- - --- - ---------- - - |')
+    print('     4    \    10    10       49       5 /')
+    print('')
+    print('     1               2            2            2')
+    print('   - - exp(- (9 x - 4)  - (9 y - 7)  - (9 z - 5) )')
+    print('     5 ')
+    print('')
+    print('          /            2            2            2 \ ')
+    print('     3    |   (9 x - 2)    (9 y - 2)    (9 z - 2)  |')
+    print('   + - exp| - ---------- - ---------- - ---------- |')
+    print('     4    \        4            4            4     /')
+    print('')
+    print('           /            2            2            2 \ ')
+    print('     1     |   (9 x - 7)    (9 y - 3)    (9 z - 5)  |')
+    print('   + -  exp| - ---------- - ---------- - ---------- |')
+    print('     2     \        4            4            4     /')
+    print('over the sphere surface (radius 1) with exact and approx normal is')
+    print(Error_in_the_Approximate_Surface_Integral_f2_Exact_Normal[0])
+    print(Error_in_the_Approximate_Surface_Integral_f2_Approx_Normal[0])
     
-    print '====================================================================' 
-    print 'The relative error in the approximation of the surface integral of' 
-    print 'f3(x,y,z)=                                                        '
-    print '     1   tanh(9 x + 9 y - 9 z)'
-    print '   - -   ---------------------'
-    print '     9             9          '
-    print 'over the sphere surface (radius 1) with exact and approx normal is'
-    print Error_in_the_Approximate_Surface_Integral_f3_Exact_Normal[0]
-    print Error_in_the_Approximate_Surface_Integral_f3_Approx_Normal[0]
+    print('====================================================================')
+    print('The relative error in the approximation of the surface integral of')
+    print('f3(x,y,z)=                                                        ')
+    print('     1   tanh(9 x + 9 y - 9 z)')
+    print('   - -   ---------------------')
+    print('     9             9          ')
+    print('over the sphere surface (radius 1) with exact and approx normal is')
+    print(Error_in_the_Approximate_Surface_Integral_f3_Exact_Normal[0])
+    print(Error_in_the_Approximate_Surface_Integral_f3_Approx_Normal[0])
     
-    print '====================================================================' 
-    print 'The relative error in the approximation of the surface integral of' 
-    print 'f4(x,y,z)=                                                        '
-    print '     1   sign(9 x + 9 y - 9 z)'
-    print '   - -   ---------------------'
-    print '     9             9          '
-    print 'over the sphere surface (radius 1) with exact and approx normal is'
-    print Error_in_the_Approximate_Surface_Integral_f4_Exact_Normal[0]
-    print Error_in_the_Approximate_Surface_Integral_f4_Approx_Normal[0]
+    print('====================================================================')
+    print('The relative error in the approximation of the surface integral of')
+    print('f4(x,y,z)=                                                        ')
+    print('     1   sign(9 x + 9 y - 9 z)')
+    print('   - -   ---------------------')
+    print('     9             9          ')
+    print('over the sphere surface (radius 1) with exact and approx normal is')
+    print(Error_in_the_Approximate_Surface_Integral_f4_Exact_Normal[0])
+    print(Error_in_the_Approximate_Surface_Integral_f4_Approx_Normal[0])
     
-    print '====================================================================' 
-    print 'The relative error in the approximation of the surface integral of' 
-    print 'f5(x,y,z)=1 over the sphere surface (radius 1) with exact and approx normal is'
-    print Error_in_the_Approximate_Surface_Integral_f5_Exact_Normal[0]
-    print Error_in_the_Approximate_Surface_Integral_f5_Approx_Normal[0]
-    print '====================================================================' 
+    print('====================================================================')
+    print('The relative error in the approximation of the surface integral of' )
+    print('f5(x,y,z)=1 over the sphere surface (radius 1) with exact and approx normal is')
+    print(Error_in_the_Approximate_Surface_Integral_f5_Exact_Normal[0])
+    print(Error_in_the_Approximate_Surface_Integral_f5_Approx_Normal[0])
+    print('====================================================================')
     
     return

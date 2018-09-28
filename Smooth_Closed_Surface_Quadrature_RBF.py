@@ -1,3 +1,5 @@
+from __future__ import division, print_function
+
 def Smooth_Closed_Surface_Quadrature_RBF(Quadrature_Nodes,Triangles,*args):
     
     import math
@@ -62,10 +64,10 @@ def Smooth_Closed_Surface_Quadrature_RBF(Quadrature_Nodes,Triangles,*args):
         gradh=args[1];
         exact_n_S_flag=1;
         if np.linalg.norm(h(Quadrature_Nodes),ord=np.inf)>100*np.spacing(1):
-            print ''
-            print 'Warning: h(x,y,z) is not sufficiently close to zero for'
-            print 'all points in Quadrature_Nodes.'
-            print ''
+            print('')
+            print('Warning: h(x,y,z) is not sufficiently close to zero for')
+            print('all points in Quadrature_Nodes.')
+            print('')
     else:
         exact_n_S_flag=0;        
     #==========================================================================
@@ -326,12 +328,12 @@ def Smooth_Closed_Surface_Quadrature_RBF(Quadrature_Nodes,Triangles,*args):
         # of the matrix P has the form
         # [1 xi' yi' xi'^2 xi'*yi' yi'^2 xi'^3 xi'^2*yi' xi'*yi'^2 yi'^3 .....]
         #==========================================================================
-        P=np.ones((Number_of_Nearest_Neighbors,(Poly_Order+1)*(Poly_Order+2)/2));
+        P=np.ones((Number_of_Nearest_Neighbors,(Poly_Order+1)*(Poly_Order+2) // 2));
         for orderindex in range(1,int(Poly_Order+1)):
             for termindex in range(0,int(np.floor(orderindex/2)+1)):
-                P[:,(orderindex)*(orderindex+1)/2+termindex]=np.multiply(RBF_Centers_in_Plane[:,0],P[:,(orderindex-1)*(orderindex)/2+termindex]);
-                if termindex<orderindex/2+1:
-                    P[:,(orderindex+1)*(orderindex+2)/2-(termindex+1)]=np.multiply(RBF_Centers_in_Plane[:,1],P[:,(orderindex)*(orderindex+1)/2-(termindex+1)]);
+                P[:,(orderindex)*(orderindex+1) // 2+termindex]=np.multiply(RBF_Centers_in_Plane[:,0],P[:,(orderindex-1)*(orderindex)//2+termindex]);
+                if termindex<orderindex//2+1:
+                    P[:,(orderindex+1)*(orderindex+2)//2-(termindex+1)]=np.multiply(RBF_Centers_in_Plane[:,1],P[:,(orderindex)*(orderindex+1)//2-(termindex+1)]);
         #==========================================================================
                 
         if exact_n_S_flag==1:
@@ -340,7 +342,7 @@ def Smooth_Closed_Surface_Quadrature_RBF(Quadrature_Nodes,Triangles,*args):
             # Compute the quadrature weights in the 2-coordinate plane.  This
             # solves the linear system Atilde*w=Itilde from the paper.
             #==========================================================================
-            w=np.linalg.solve(np.vstack([np.hstack([np.sqrt(np.power(r2,7)),P]),np.hstack([(P.T),np.zeros((((Poly_Order+1)*(Poly_Order+2))/2,((Poly_Order+1)*(Poly_Order+2))/2))])]),np.hstack([I_RBF,I_poly]).T);
+            w=np.linalg.solve(np.vstack([np.hstack([np.sqrt(np.power(r2,7)),P]),np.hstack([(P.T),np.zeros((((Poly_Order+1)*(Poly_Order+2))//2,((Poly_Order+1)*(Poly_Order+2))//2))])]),np.hstack([I_RBF,I_poly]).T);
             RBF_Centers_in_Plane=np.vstack([RBF_Centers_in_Plane[:,0]+RBF_Centers_in_Plane_Shift[0],RBF_Centers_in_Plane[:,1]+RBF_Centers_in_Plane_Shift[1]]).T;
             #==========================================================================
         
@@ -359,7 +361,7 @@ def Smooth_Closed_Surface_Quadrature_RBF(Quadrature_Nodes,Triangles,*args):
             # Construct the interpolation matrix and find its QR decomposition.
             #
             #==========================================================================
-            [Q,R]=np.linalg.qr(np.vstack([np.hstack([np.sqrt(np.power(r2,7)),P]),np.hstack([(P.T),np.zeros((((Poly_Order+1)*(Poly_Order+2))/2,((Poly_Order+1)*(Poly_Order+2))/2))])]));    
+            [Q,R]=np.linalg.qr(np.vstack([np.hstack([np.sqrt(np.power(r2,7)),P]),np.hstack([(P.T),np.zeros((((Poly_Order+1)*(Poly_Order+2))//2,((Poly_Order+1)*(Poly_Order+2))//2))])]));    
             #==========================================================================
     
             #==========================================================================
@@ -368,9 +370,9 @@ def Smooth_Closed_Surface_Quadrature_RBF(Quadrature_Nodes,Triangles,*args):
             # z(xhat,yhat).
             #
             #==========================================================================
-            cx=sp.linalg.solve_triangular(R,np.dot(Q.T,np.vstack([np.array([Quadrature_Nodes[nni,0]]).T,np.zeros(((Poly_Order+1)*(Poly_Order+2)/2,1))])),check_finite=False);
-            cy=sp.linalg.solve_triangular(R,np.dot(Q.T,np.vstack([np.array([Quadrature_Nodes[nni,1]]).T,np.zeros(((Poly_Order+1)*(Poly_Order+2)/2,1))])),check_finite=False);
-            cz=sp.linalg.solve_triangular(R,np.dot(Q.T,np.vstack([np.array([Quadrature_Nodes[nni,2]]).T,np.zeros(((Poly_Order+1)*(Poly_Order+2)/2,1))])),check_finite=False);
+            cx=sp.linalg.solve_triangular(R,np.dot(Q.T,np.vstack([np.array([Quadrature_Nodes[nni,0]]).T,np.zeros(((Poly_Order+1)*(Poly_Order+2)//2,1))])),check_finite=False);
+            cy=sp.linalg.solve_triangular(R,np.dot(Q.T,np.vstack([np.array([Quadrature_Nodes[nni,1]]).T,np.zeros(((Poly_Order+1)*(Poly_Order+2)//2,1))])),check_finite=False);
+            cz=sp.linalg.solve_triangular(R,np.dot(Q.T,np.vstack([np.array([Quadrature_Nodes[nni,2]]).T,np.zeros(((Poly_Order+1)*(Poly_Order+2)//2,1))])),check_finite=False);
             #==========================================================================    
                 
             #==========================================================================
@@ -480,7 +482,7 @@ def Polynomial_Term_Right_Triangle_Double_Integrals(Triangle_Vertices,poly_order
     # being output.  The operators '*', '/', '**' are used in place of '*', '/', '^'
     # in order to simplify possible future vectorization.
 
-    I_poly=np.zeros(((poly_order+1)*(poly_order+2)/2));
+    I_poly=np.zeros(((poly_order+1)*(poly_order+2) // 2));
     
     for Side_Index in range(0,3):
         xV1=Triangle_Vertices[Side_Index,0];
